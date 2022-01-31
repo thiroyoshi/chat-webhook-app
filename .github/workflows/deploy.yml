@@ -1,0 +1,54 @@
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+
+# name: Deploy All
+
+# on:
+#   push:
+#     branches: [ main ]
+#   pull_request:
+#     branches: [ main ]
+
+# jobs:
+#   build:
+
+#     runs-on: ubuntu-latest
+
+#     strategy:
+#       matrix:
+#         node-version: [16.x]
+
+#     steps:
+#     - uses: actions/checkout@v2
+#     - name: Build Front App
+#       run: |
+#         npm install
+#         npm run build
+#       working-directory: ./front
+#     - name: Setup AWS CLI
+#       uses: unfor19/install-aws-cli-action@master
+#       with:
+#         version: 2
+#     - name: Deploy All
+#       run: |
+#         npm install
+#         npm run cdk:diff
+#         npm run cdk:deploy
+#       working-directory: ./backend
+#       env:
+#         AWS_DEFAULT_REGION: ap-northeast-1
+#         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#     - name: Remove Cache
+#       run: |
+#         json=`aws cloudfront list-distributions --query DistributionList.Items[]`
+#         Id=`echo $json | jq -r '.[] | select(.Comment=="vueslsapp") | .Id'`
+#         if [ -n "$Id" ] ;then aws cloudfront create-invalidation --distribution-id $Id --paths "/*";else echo "Not found the Distribution."; fi
+#       env:
+#         AWS_DEFAULT_REGION: ap-northeast-1
+#         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#     - uses: actions/upload-artifact@v1
+#       with:
+#         name: chat-webhook-app
+#         path: front/build        
